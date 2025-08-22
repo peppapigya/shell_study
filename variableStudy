@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# 变量学习shel
+# 版权 2025 peppa-pig
+
+# Globals:
+# Arguments:
+#  None
+# 变量的声明，变量名和符号之间不能存在空格，声明变量的时候不需要加$符号
+name="tom"
+echo $name
+# 变量可以重复定义
+name="jim"
+# 使用$获取已经声明的变量的值
+echo $name
+# 使用语句进行赋值
+for file in $(/etc); do
+  echo "Item: $file"
+done
+
+# 获取声明变量的值的时候理论上是需要加{}但是也可以不加，
+# 加上{}主要是为了分清一个界限,下面一个例子就是必须需要加{}的例子，要不然就会将namewhat识别为变量
+echo "I am ${name}what is you name"
+
+# 声明只读变量,只读变量不能被重新赋值
+url="http://baidu.com"
+readonly url
+# 不可以再重新赋值
+#url="http://github.com"
+
+# 删除变量,删除之后的变量不能再被使用，但是unset不能删除只读变量,不会报错
+unset name
+echo $name
+
+# 变量类型
+
+# string2种类型,可以使用单引号（''）也可以使用双引号("")，不过双引号可以格式化字符
+my_string='sting1'
+my_string="string2"
+format_string="i am \"string\"!"
+echo $format_string
+# 通过双引号去拼接字符
+
+name="tim"
+merge_string="hello "${name}"!"
+echo ${merge_string}
+
+# 获取字符串长度
+echo "字符串长度1：" ${#name}
+
+# 提取字符串，第一个参数是开始的下标，第二个是需要截取多少个字符
+string="hello world!"
+# 截取下标1开始截取4个字符
+echo ${string:1:4}
+# 会查找第一个字符出现的下标，对于这个例子需要先找l的下标位置
+echo "查找字符串测试：" $(expr index "$string" lw)
+# Shell数组类型,元素之间用空格隔开
+array01=("张三" "lisi" "王五")
+
+# 直接下标赋值
+array01[0]="zhangSan"
+
+# 读取数组元素
+echo ${array01[0]}
+
+# 获取元素所有的元素
+echo ${array01[@]}
+# 获取数组长度
+echo "数组长度：" ${#array01[*]}
+
+
+# 多行注释
+:<<EOF
+注释内容....
+注释内容....
+EOF
+
+:<<"COMMENT"
+这是注释内容
+多行注释
+COMMENT
+
+: '
+  这是注释
+  多行注释
+'
+
+
+
+
