@@ -1,0 +1,219 @@
+#!/bin/bash
+#
+# 运算符学习
+# 版权 2025 peppa-pig
+
+: '
+原生的bash不支持运算，就必须借助其他的命令去实现，可以使用expr和awk实现,expr最常用
+'
+# 算术运算符，符号两边必须有符号相隔要不然会直接输出表达式不会输出正确结果，乘号需要加个\
+echo "计算2+2的结果：" `expr 2 + 2 `
+a=3
+b=4
+echo "计算a-b的结果 ：`expr ${a} - ${b}`"
+echo "计算a*b的结果：`expr ${a} \* ${b}`"
+# 输出3/4并没有输出计算结果
+echo "计算a/b的结果：`expr ${b}/${a}`"
+# 要想输出计算结果
+echo "计算a / b的结果: `expr ${b} / ${a}`"
+echo "计算a % b的结果：`expr ${b} % ${a}`"
+# 注意点：使用if的[]里面的条件必须和[]各隔开一个空格
+if [ $a == $b ]
+then
+  echo "a 等于 b"
+fi
+if [ $a != $b ]; then
+    echo "a 不等于 b"
+fi
+# 关系运算符-q(等于),-ne(不等于)，-ge (大于等于)，-gt(大于等于)，-le(小于等于)，-lt(小于)
+a=10
+b=20
+# -eq
+if [ $a -eq $b ]; then
+  echo "${a} -eq ${b}: a 等于 b"
+else
+  echo "${a} -eq ${b}: a不等于 b"
+fi
+# -ne
+if [ $a -ne  $b ];
+then
+  echo "$a -ne $b: a不等于b"
+else
+  echo "$a -ne $b；a不等于b"
+fi
+
+# -ge
+if [ $a -ge $b ]
+then
+  echo "$a -ge $b: a大于等于b"
+else
+  echo "$a - ge $b: a小于b"
+fi
+
+# -gt 大于
+if [ $a -gt $b ]
+then
+  echo "$a -gt $b: a大于b"
+else
+  echo "$a -gt $b: a小于等于b"
+fi
+
+# -le 小于等于
+if [ $a -le $b ];
+then
+  echo "$a -le $b:a小于等于b"
+else
+  echo "$a -le $b:a大于b"
+fi
+# -lt 大于
+if [ $a -lt $b ];
+then
+  echo "$a -lt $b：a大于b"
+else
+  echo "$a -lt $b: a小于等于b"
+fi
+# 布尔运算符 !非，-o或，-a与,不过-a和-o都是很老的东西了，已经被&&和||代替了
+if [ ${a} != ${b} ]
+then
+  echo "$a != $b: a不等于b"
+fi
+
+if [ $a -le 100 -a $b -gt 10 ];
+then
+  echo "a 小于等于100 -a(并且)b 大于等于10"
+else
+  echo " $a -le 100 -a $a -gt 10"
+fi
+
+if [ $a -le 100 -o $a -gt 10 ];
+then
+  echo "a 小于等于100 -a(并且)b 大于等于10"
+else
+  echo "测试-o else"
+fi
+
+if [ $a -le 100 ] && [ $b -gt 10 ];
+then
+  echo "&&写法：a 小于等于100 -a(并且)b 大于等于10"
+else
+  echo " [$a -le 100] && [$a -gt 10]"
+fi
+
+if [ $a -le 100 ] || [ $a -gt 10 ] ;
+then
+  echo "|| 写法：a 小于等于100 -a(并且)b 大于等于10"
+else
+  echo "测试-o else"
+fi
+# 字符串运算符
+: '
+ 1. =:检测俩个字符串是否相等
+ 2. !=: 检验2个字符串是否不相等
+ 3. -z:判断字符串长度是否为0
+ 4. -n: 判断字符串长度是否不为0
+ 5. $:检验字符串是否为空
+ '
+a="abc"
+b="bcd"
+# =
+if [ $a = $b ];
+then
+  echo "$a = $b: a等于b"
+else
+  echo "$a != $b：a不等于b"
+fi
+
+# !=
+if [ $a != $b ];
+then
+  echo "$a != $b:a不等于b"
+else
+  echo "$a != $b: a等于b"
+fi
+
+# -n
+if [ -n "$a" ]
+then
+  echo "字符串长度不为0:$a"
+else
+  echo "字符串长度为0"
+fi
+
+# -z
+if [ -z "$a" ]
+then
+  echo "字符串长度为0"
+else
+  echo "字符串长度不为0：$a"
+fi
+
+# $
+if [ $a ]
+then
+  echo "字符串a不为空"
+else
+  echo "字符串a为空"
+fi
+# 文件测试运算符
+: '
+1. -b file:检测文件是否是块设备文件
+2. -c file:检验文件是否是字符设备文件
+3. -d file：校验文件是否是目录
+4. -f file：校验文件是否是普通文件（既不是目录也不是设备文件）
+5. -g file：校验文件是否设置了SGID（set group id）位，设置了SGID之后，无论谁执行这个文件都会以文件所属组的权限运行
+6. -k file：校验文件是否设置了粘着位（Sticky Bit），设置了粘着位之后，只有文件的所有者、所在目录的所有者、root用户可以删除或重命名该目录中的文件
+7. -p file：校验文件是否是有名管道，|是匿名管道，通过mkfifo定义有名管道
+8. -u file：校验文件是否设置了SUID（Set user id）位，无论哪个用户执行该文件，都会以该文件的所有者的权限去执行
+9. -r file：校验文件是否可读
+10. -w file：校验文件是否可写
+11. -x file：校验文件是否可执行
+12. -s file：校验文件是否为空
+13. -e file：校验文件或者目录是否存在
+'
+file="/mnt/c/yingyong/study/shell_study/operatorStudy"
+if [ -e $file ]
+then
+  echo "$file,文件存在"
+  if [ -r $file ]
+  then
+    echo "该文件可读：$file"
+  else
+    echo "该文件不可读：$file"
+  fi
+  if [ -w $file ]
+  then
+    echo "该文件可写"
+  else
+    echo "该文件不可写"
+  fi
+  if [ -x $file ]
+  then
+    echo "该文件可执行"
+  else
+    echo "该文件不可执行"
+  fi
+else
+  echo "没有该文件或者目录"
+fi
+
+
+: '
+  自增自减运算符
+
+'
+# 第一种自增操作,不过首选应该是expr
+num=5
+# 自增
+let num++
+# 自减
+let num--
+echo "num1: $num"
+
+# 第二种(())
+num=$((num+1))
+num=$((num-2))
+echo "num2: $num"
+# 第三种，使用expr
+num=$(expr $num + 1)
+
+

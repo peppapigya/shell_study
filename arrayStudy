@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# 数组学习记录
+# 版权 2025 peppa-pig
+
+# Globals:
+# Arguments:
+#  None
+
+: '
+  数组的学习，主要包括数组的声明、数组的遍历、数组的赋值
+'
+# 第一种声明
+array01=("张三" 1 "lisi")
+# 通过下标去赋值
+array02[0]="李四"
+array02[1]=2
+array02[2]="王五"
+
+# 读取数组元素
+echo "读取数组元素1：" ${array01[0]}
+echo "读取数组元素2：" ${array02[0]}
+
+# 关联数组，通过declare -A 定义关联数组，相当于map
+declare -A array03=(["lisi"]=18 ["张三"]=20 ["王五"]=30)
+
+# 通过直接赋值的方式去声明
+declare -A array04
+array04["lisi"]=19
+array04["张三"]=31
+array04["王五"]=41
+
+# 访问元素
+echo "关联数组元素1：" ${array03["lisi"]}
+echo "关联数组元素2：" ${array04["张三"]}
+echo "访问关联数组没有key：" ${array04["111"]}
+
+# 访问数组所有元素
+echo "访问普通数组所有元素：${array02[@]}"
+# 只是访问关联数组的value值
+echo "访问关联数组所有元素：${array04[*]}"
+# 获取关联数组的所有key值
+echo "访问关联数组key值：${!array04[*]}"
+
+# 获取数组长度
+echo "数组长度：${#array04[*]}"
