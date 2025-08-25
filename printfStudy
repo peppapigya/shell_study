@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# printf学习
+# 版权 2025 peppa-pig
+
+: '
+printf和C语言的语法是相似的
+%d:整数，%s：字符串，%f：浮点数，%c：字符，%x：十六进制，%o：八进制，%b：二进制，
+
+'
+# 变量的输出
+name="李四"
+printf "hello world! %s" $name
+
