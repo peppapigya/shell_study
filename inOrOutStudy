@@ -1,0 +1,20 @@
+#!/bin/bash
+
+: '
+  0: 标准输入
+  1: 标准输出
+  2: 标准错误
+'
+# 覆盖写入文件
+command > output.txt
+# 追加文件
+command >> output.txt
+
+# 将ls运行的命令输入到文件当中
+ls -l > file.txt
+echo "追加内容" >> file.txt
+
+# 重定向
+command 2> error.log
+# 标准和错误输出都输入重定向目标文件
+command &> error.log
