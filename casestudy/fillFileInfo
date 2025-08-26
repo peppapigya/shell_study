@@ -1,0 +1,13 @@
+#!/bin/bash
+
+: '
+循环向文件中追加内容，后续可以备份数据库文件，以及日志文件
+'
+file_name="file01.txt"
+
+for (( i = 0; i <= 5; i++ ))
+do
+  echo "this is a file info,序号为：$i" >> $file_name
+done
+
+
