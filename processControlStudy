@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# 流程控制
+# 版权 2025 peppa-pig
+
+
+: '
+ 1. if
+ 2. for
+ 3. while
+ 5. until
+'
+
+# if的使用,等号之间需要加空格
+a=10
+b=20
+if [ $a == $b ];
+then
+  echo "a 等于 b"
+elif [ $a -gt $b ];
+then
+  echo "a 大于 b"
+else
+  echo "a 小于 b"
+fi
+
+# if(())形式的判断，可以使用>,<
+if (( ${a} == ${b} ))
+then
+  echo "a 等于 b"
+elif (( ${a} > ${b} ))
+then
+  echo "a 大于 b"
+else
+  echo "a 小于 b"
+fi
+# if 搭配 test
+a1=$[2*2]
+a2=$[4]
+if test $[a1] == $[a2]
+then
+  echo "a 等于 b"
+else
+  echo "a 不等于 b"
+fi
+
+# for 循环
+for i in 1 2 3 4 5
+do
+  echo "for遍历数组元素：${i}"
+done
+# while循环
+t=5
+while(($t>0))
+do
+  echo "while循环遍历：$t"
+  t=`expr $t - 1`
+  if [ ${t} == 4 ]
+  then
+    break
+  fi
+done
