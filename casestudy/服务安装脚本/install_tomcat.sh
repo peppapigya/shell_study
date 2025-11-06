@@ -2,9 +2,6 @@
 
 set -Eeuo pipefail
 
-
-
-
 # 定义我们全局需要安装的依赖包
 declare -ar dependency_packages=(pv)
 declare -r tools_dir="/usr/local/tools" package_dir="/tmp" backup_dir="/tmp/backup"
@@ -13,6 +10,7 @@ jdk17_url="https://mirrors.huaweicloud.com/openjdk/17.0.1/openjdk-17.0.1_linux-x
 declare -r tomcat9_version_url="https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v9.0.109/bin/apache-tomcat-9.0.109.tar.gz"
 declare -r  tomcat10_version_url="https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-10/v10.1.48/bin/apache-tomcat-10.1.48.tar.gz"
 declare -r tomcat11_version_url="https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-11/v11.0.10/bin/apache-tomcat-11.0.10.tar.gz"
+declare  -r maven_url="https://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz"
 real_install_tomcat_name=""
 JAVA_HOME=""
 declare -i tomcat_version_num=1
@@ -208,6 +206,20 @@ get_tomcat_service_name() {
   echo "${service_dir}"
 }
 
+install_maven() {
+  echo "正在安装maven..."
+  cd "${package_dir}" && \
+  wget  ${maven_url}
+  [ -d "${tools_dir}" ] || mkdir "${tools_dir}"
+  tar -xzvf apache-maven-3.8.9-bin.tar.gz -C "${tools_dir}" >/dev/null 2>&1
+
+  ln -sfn "${tools_dir}/apache-maven-3.8.9" "${tools_dir}/maven"
+  cp -a /etc/profile "${backup_dir}/profile.bak"
+  echo "export PATH=${tools_dir}/maven/bin:$PATH" >> /etc/profile
+  source /etc/profile
+  mvn -v
+  echo "maven安装成功"
+}
 
 main() {
   # todo 将旧版的tomcat还有旧版jdk进行删除，再去执行安装
@@ -216,6 +228,8 @@ main() {
   get_package
   before_config_tomcat
   config_tomcat
+
+  install_maven
 }
 
 main "$@"
