@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  nginx:
+    image: nginx:1.28
+    container_name: web-nginx-java
+    restart: no
+    depends_on:
+      - tomcat1
+      - tomcat2
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - common-network
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+      - ./nginx/logs:/var/log/nginx:rw
+      - /etc/localtime:/etc/localtime:ro
+
+  redis:
+    image: redis:7.0.5
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=peppa-pig
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+    networks:
+      - common-network
+  tomcat1:
+    hostname: tomcat1
+    build: ./tomcat1
+    container_name: tomcat1
+    restart: always
+    volumes:
+      - ./tomcat1/webserver/tomcatA:/usr/local/tomcat/webapps/ROOT:ro
+      - /etc/localtime:/etc/localtime:ro
+  tomcat2:
+    hostname: tomcat2
+    build: ./tomcat
+    container_name: tomcat2
+    volumes:
+      - ./tomcat1/webserver/tomcatB:/usr/local/tomcat/webapps/ROOT:ro
+      - /etc/localtime:/etc/localtime:ro
+
+
+networks:
+  common-network:
+    driver: bridge

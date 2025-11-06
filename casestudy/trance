@@ -1,0 +1,161 @@
+#!/bin/bash
+
+# 回收站目录
+TRASH_DIR="$HOME/.local/share/Trash"
+TRASH_FILES_DIR="$TRASH_DIR/files"
+TRASH_INFO_DIR="$TRASH_DIR/info"
+
+# 创建回收站目录
+mkdir -p "$TRASH_FILES_DIR" "$TRASH_INFO_DIR"
+
+# 显示使用说明
+usage() {
+    echo "回收站管理脚本"
+    echo "用法:"
+    echo "  trash.sh put <文件/目录>    - 将文件/目录移动到回收站"
+    echo "  trash.sh list              - 列出回收站中的文件"
+    echo "  trash.sh restore <文件名>  - 从回收站恢复文件"
+    echo "  trash.sh empty             - 清空回收站"
+    echo "  trash.sh rm <文件名>       - 删除回收站中的特定文件"
+}
+
+# 移动到回收站
+trash_put() {
+    if [ $# -eq 0 ]; then
+        echo "错误: 请指定要删除的文件或目录"
+        exit 1
+    fi
+
+    for item in "$@"; do
+        if [ ! -e "$item" ]; then
+            echo "警告: '$item' 不存在，跳过"
+            continue
+        fi
+
+        # 获取绝对路径
+        item_path=$(realpath "$item")
+        item_name=$(basename "$item_path")
+
+        # 生成唯一文件名（防止重名）
+        timestamp=$(date +%Y%m%d%H%M%S)
+        unique_name="${item_name}.${timestamp}"
+
+        # 移动文件到回收站
+        mv "$item_path" "$TRASH_FILES_DIR/$unique_name"
+
+        # 创建信息文件（记录原始路径）
+        info_file="$TRASH_INFO_DIR/$unique_name.trashinfo"
+        echo "[Trash Info]" > "$info_file"
+        echo "Path=$item_path" >> "$info_file"
+        echo "DeletionDate=$(date +%Y-%m-%dT%H:%M:%S)" >> "$info_file"
+
+        echo "已移动到回收站: $item_path"
+    done
+}
+
+# 列出回收站内容
+trash_list() {
+    if [ -z "$(ls -A "$TRASH_FILES_DIR")" ]; then
+        echo "回收站为空"
+        return
+    fi
+
+    echo "回收站内容:"
+    echo "序号 | 文件名 | 原路径 | 删除时间"
+    echo "----------------------------------------"
+
+    count=1
+    for info_file in "$TRASH_INFO_DIR"/*.trashinfo; do
+        if [ -f "$info_file" ]; then
+            filename=$(basename "$info_file" .trashinfo)
+            original_path=$(grep '^Path=' "$info_file" | cut -d= -f2-)
+            deletion_date=$(grep '^DeletionDate=' "$info_file" | cut -d= -f2-)
+            echo "$count | $filename | $original_path | $deletion_date"
+            count=$((count + 1))
+        fi
+    done
+}
+
+# 从回收站恢复文件
+trash_restore() {
+    if [ $# -eq 0 ]; then
+        echo "错误: 请指定要恢复的文件名"
+        exit 1
+    fi
+
+    for trash_item in "$@"; do
+        info_file="$TRASH_INFO_DIR/$trash_item.trashinfo"
+        trash_file="$TRASH_FILES_DIR/$trash_item"
+
+        if [ ! -f "$info_file" ] || [ ! -e "$trash_file" ]; then
+            echo "错误: '$trash_item' 不在回收站中"
+            continue
+        fi
+
+        original_path=$(grep '^Path=' "$info_file" | cut -d= -f2-)
+        original_dir=$(dirname "$original_path")
+
+        # 确保目标目录存在
+        mkdir -p "$original_dir"
+
+        # 恢复文件
+        mv "$trash_file" "$original_path"
+        rm "$info_file"
+
+        echo "已恢复: $original_path"
+    done
+}
+
+# 清空回收站
+trash_empty() {
+    if [ -z "$(ls -A "$TRASH_FILES_DIR")" ]; then
+        echo "回收站已经是空的"
+        return
+    fi
+
+    echo "即将清空回收站，共 $(ls -1 "$TRASH_FILES_DIR" | wc -l) 个项目"
+    read -p "确认清空回收站？(y/N): " confirm
+    if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+        rm -rf "$TRASH_FILES_DIR"/*
+        rm -rf "$TRASH_INFO_DIR"/*
+        echo "回收站已清空"
+    else
+        echo "操作已取消"
+    fi
+}
+
+# 删除回收站中的特定文件
+trash_rm() {
+    if [ $# -eq 0 ]; then
+        echo "错误: 请指定要删除的文件名"
+        exit 1
+    fi
+
+    for trash_item in "$@"; do
+        info_file="$TRASH_INFO_DIR/$trash_item.trashinfo"
+        trash_file="$TRASH_FILES_DIR/$trash_item"
+
+        if [ ! -f "$info_file" ] || [ ! -e "$trash_file" ]; then
+            echo "错误: '$trash_item' 不在回收站中"
+            continue
+        fi
+
+        rm -rf "$trash_file"
+        rm -f "$info_file"
+        echo "已永久删除: $trash_item"
+    done
+}
+
+# 主程序
+case "$1" in
+    put|rm|restore|list|empty)
+        command="$1"
+        shift
+        "trash_$command" "$@"
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+

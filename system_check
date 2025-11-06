@@ -1,0 +1,94 @@
+#!/bin/bash
+: '
+  description: 系统巡检脚本
+  author: peppa-pig
+  version: v1.0.0
+'
+echo '##############################'
+echo "##系统基本信息"
+ehco "主机名：$(hostname)"
+echo "ip地址：$(hostname -i | awk '{print $2}')"
+echo "公网ip地址：$(curl ifconfig.io)"
+echo "系统发行版本：$(awk -F '=' 'NR==5 {print$2}' /etc/os-release)"
+echo "内核版本：$(uname -r)"
+echo "系统语言和字符集：$($LANG)"
+echo '##############################'
+
+echo '##############################'
+echo "##系统信息"
+echo "1. CPU信息"
+echo "CPU架构：$(uname -m)"
+echo "CPU型号：$(lscpu | awk 'NR==13{print $2}')"
+echo "CPU颗数：$(lscpu | awk 'NR==5 {print $2}')"
+echo "CPU核心数：$(nproc)"
+ehco "CPU空闲率：$(top -bn1 | awk '/%Cpu/ {print}' | grep -oE "[0-9.]+" | awk 'NR==4')"
+echo "CPU用户态使用率：$(top -bn1 | awk '/%Cpu/ {print}' | grep -oE "[0-9.]+" | awk 'NR==1')"
+echo "CPU内核态使用率：$(top -bn1 | awk '/%Cpu/ {print}' | grep -oE "[0-9.]+" | awk 'NR==2')"
+ehco "CPU io占用率：$(top -bn1 | awk '/%Cpu/ {print}' | grep -oE "[0-9.]+" | awk 'NR==5')"
+echo ""
+echo "2. 内存信息"
+echo "总内存：$(free -h | awk 'NR==2 {print $2}')"
+echo "已使用内存：$(free -h | awk 'NR==2 {print $3}')"
+echo "可用内存：$(free -h | awk 'NR==2 {print $4}')"
+swap_total=$(free -h | grep 'Swap' | awk '{print $2}')
+if [[ "$swap_total" = "0B" ]]; then
+  echo "未开启swap分区："
+ else
+  echo "开启swap分区："
+  echo "swap总大小：$(swap_total)"
+  echo "swap已使用大小：$(free -h | grep 'Swap' | awk '{print $3}')"
+  echo "swap剩余大小：$(free -h | grep 'Swap' | awk '{print $4}')"
+fi
+echo ""
+echo "3. 磁盘信息"
+echo "磁盘个数："
+echo "磁盘分区大小："
+echo "磁盘分区使用率："
+echo "磁盘分区inode使用率"
+echo ""
+echo "4. 负载信息"
+echo "最近一分钟："
+echo "最近5分钟："
+echo "最近15分钟："
+
+echo ""
+echo "5. 用户信息"
+echo "可登录的用户数量："
+echo "可登录的用户名："
+echo "虚拟用户数量："
+echo "dns信息："
+echo "dns是否可用："
+echo "是否有epel源："
+ehco ""
+ehco "6. 服务信息"
+echo "selinux："
+# 如果防火墙开启了，显示具体的防火墙规则，如果未开启直接显示关闭
+cat <<EOF
+ "防火墙状态："
+ "监听的端口："
+ "僵尸进程数量："
+ "开机自启动服务："
+ ""
+EOF
+
+echo '##############################'
+
+
+
+echo '##############################'
+echo "##系统基本信息"
+
+echo '##############################'
+
+
+
+echo '##############################'
+echo "##系统基本信息"
+
+echo '##############################'
+
+
+echo '##############################'
+echo "##系统基本信息"
+
+echo '##############################'

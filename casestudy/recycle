@@ -1,0 +1,36 @@
+#!/bin/bash
+
+TRASH_DIR="$HOME/recycle"
+# 默认目录，如果生成失败的话使用默认目录兜底
+TEMP_DIR="${TRASH_DIR}/file"
+check_dir_exist() {
+  if [ -d "$1" ]; then
+    echo "$1目录不存在"
+    return 1
+  fi
+  return 0
+}
+
+main(){
+  if check_dir_exist "${TRASH_DIR}"; then
+    echo "正在创建目录..."
+    mkdir -p "${TRASH_DIR}"
+  fi
+  # 校验是否格式正确
+  if [ $# -eq 0 ]; then
+    echo "脚本格式错误，请参照rm /etc/"
+    exit 1
+  fi
+
+  # 创建临时目录,并获取名字
+  local temp_dir
+  temp_dir="$(mktemp -dp "${TRASH_DIR}")"
+  # 将文件移动到指定目录
+
+  if mv "$@" "${temp_dir}" >>/dev/null 2>&1; then
+    echo "脚本回收成功，放在目录: ${temp_dir}"
+  else
+    echo "回收失败请重试！！！"
+  fi
+
+}
