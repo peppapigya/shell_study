@@ -45,7 +45,8 @@ EOF
                   docker-latest \
                   docker-latest-logrotate \
                   docker-logrotate \
-                  docker-engine
+                  docker-engine \
+                  docker-runc
 }
 # 安装docker
 install_docker() {
