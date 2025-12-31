@@ -2,11 +2,11 @@
 set -aueo pipefail
 : '
   本脚本用于安装docker
-  仅适用于麒麟10
+  仅适用于麒麟10,后续加上ubuntu的系统
 '
 declare -r YUM_REPO="/etc/yum.repos.d/docker-ce.repo"
 # shellcheck disable=SC2155
-declare -r DOCKER_COMPOSE_URL="https://github.com/docker/compose/releases/download/v2.40.1/docker-compose-linux-$(uname -m)"
+declare -r DOCKER_COMPOSE_URL="https://github.com/docker/compose/releases/download/v2.40.3/docker-compose-linux-x86_64"
 
 
 prepare() {
@@ -14,7 +14,7 @@ prepare() {
   cat > ${YUM_REPO} << 'EOF'
 [docker-ce-stable]
 name=Docker CE Stable - $basearch
-baseurl=https://download.docker.com/linux/centos/8/$basearch/stable
+baseurl=https://download.docker.com/linux/centos/7/$basearch/stable
 enabled=1
 gpgcheck=1
 gpgkey=https://download.docker.com/linux/centos/gpg
